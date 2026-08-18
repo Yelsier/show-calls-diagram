@@ -2,6 +2,10 @@
 
 All notable changes to Show Calls Diagram are documented in this file.
 
+## [0.1.1] - 2026-08-18
+
+- Added a default-enabled setting to hide method calls made through objects.
+
 ## [0.1.0] - 2026-08-18
 
 - Added occurrence-aware TypeScript call diagrams with direct navigation to each call site.

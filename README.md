@@ -38,6 +38,7 @@ The main node button opens the source location for that specific call. The small
 | `showCallsDiagram.maxDepth` | `10` | Maximum number of call levels expanded below the selected function. Use `0` to display only the root. |
 | `showCallsDiagram.hideDefaultJsFunctions` | `true` | Hides standard JavaScript and browser APIs such as `map`, `filter`, and `replaceState`. |
 | `showCallsDiagram.hideReactHooks` | `true` | Hides React and React DOM hooks such as `useState`, `useEffect`, and `useMemo`. Custom hooks remain visible. |
+| `showCallsDiagram.hideObjectMethodCalls` | `true` | Hides method calls made through objects, such as `document.positionAt()` or `categories.load()`. |
 
 Settings are read whenever a new diagram is generated.
 

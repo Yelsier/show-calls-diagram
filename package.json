@@ -3,7 +3,7 @@
   "displayName": "Show Calls Diagram",
   "publisher": "yelsier",
   "description": "Visualize TypeScript call hierarchies and React component trees with direct source navigation.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -59,6 +59,11 @@
           "type": "boolean",
           "default": true,
           "description": "Hide calls to hooks provided by React and React DOM, such as useState and useEffect."
+        },
+        "showCallsDiagram.hideObjectMethodCalls": {
+          "type": "boolean",
+          "default": true,
+          "description": "Hide method calls made through objects, such as document.positionAt() or categories.load()."
         }
       }
     },

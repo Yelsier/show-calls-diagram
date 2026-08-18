@@ -19,6 +19,7 @@ export type BuildGraphOptions = {
   maxDepth?: number;
   hideDefaultJsFunctions?: boolean;
   hideReactHooks?: boolean;
+  hideObjectMethodCalls?: boolean;
   reactOnly?: boolean;
 };
 
@@ -38,6 +39,7 @@ export async function buildGraph(
   const maxDepth = normalizeMaxDepth(options.maxDepth);
   const hideDefaultJsFunctions = options.hideDefaultJsFunctions ?? true;
   const hideReactHooks = options.hideReactHooks ?? true;
+  const hideObjectMethodCalls = options.hideObjectMethodCalls ?? true;
   const reactOnly = options.reactOnly ?? false;
 
   return buildGraphNode(
@@ -47,6 +49,7 @@ export async function buildGraph(
     maxDepth,
     hideDefaultJsFunctions,
     hideReactHooks,
+    hideObjectMethodCalls,
     reactOnly,
   );
 }
@@ -58,6 +61,7 @@ async function buildGraphNode(
   maxDepth: number,
   hideDefaultJsFunctions: boolean,
   hideReactHooks: boolean,
+  hideObjectMethodCalls: boolean,
   reactOnly: boolean,
   navigation: NavigationLocation = { uri: item.uri, range: item.range },
 ): Promise<GraphNode> {
@@ -84,15 +88,19 @@ async function buildGraphNode(
         vscode.CallHierarchyOutgoingCall[]
       >("vscode.provideOutgoingCalls", item)) ?? []);
 
-  const sourceCalls = await getSourceCalls(item, { jsxOnly: reactOnly });
+  const sourceCallCollection = await getSourceCalls(item, {
+    jsxOnly: reactOnly,
+  });
 
   const calls: GraphNode[] = [];
   const unifiedCalls = mergeCalls(
     normalCalls,
-    sourceCalls,
+    sourceCallCollection.calls,
+    sourceCallCollection.objectMethodRanges,
     item.uri,
     hideDefaultJsFunctions,
     hideReactHooks,
+    hideObjectMethodCalls,
   );
 
   for (const call of unifiedCalls) {
@@ -123,6 +131,7 @@ async function buildGraphNode(
           maxDepth,
           hideDefaultJsFunctions,
           hideReactHooks,
+          hideObjectMethodCalls,
           reactOnly,
           callSite,
         ),
@@ -155,6 +164,7 @@ async function buildGraphNode(
         maxDepth,
         hideDefaultJsFunctions,
         hideReactHooks,
+        hideObjectMethodCalls,
         reactOnly,
         callSite,
       ),
@@ -217,9 +227,11 @@ function getOccurrenceId(
 function mergeCalls(
   normalCalls: vscode.CallHierarchyOutgoingCall[],
   sourceCalls: SourceCall[],
+  objectMethodRanges: vscode.Range[],
   callerUri: vscode.Uri,
   hideDefaultJsFunctions: boolean,
   hideReactHooks: boolean,
+  hideObjectMethodCalls: boolean,
 ): UnifiedCall[] {
   const calls: UnifiedCall[] = [];
   const seenOccurrences = new Set<string>();
@@ -253,6 +265,13 @@ function mergeCalls(
     }
 
     for (const callSiteRange of call.fromRanges) {
+      if (
+        hideObjectMethodCalls &&
+        objectMethodRanges.some((range) => rangesOverlap(range, callSiteRange))
+      ) {
+        continue;
+      }
+
       addCall({
         name: target.name,
         targetUri: target.uri,
@@ -265,6 +284,10 @@ function mergeCalls(
   }
 
   for (const call of sourceCalls) {
+    if (hideObjectMethodCalls && call.isObjectMethod) {
+      continue;
+    }
+
     if (hideDefaultJsFunctions && isDefaultJsFunctionUri(call.uri)) {
       continue;
     }
@@ -291,4 +314,8 @@ function mergeCalls(
       leftStart.character - rightStart.character
     );
   });
+}
+
+function rangesOverlap(left: vscode.Range, right: vscode.Range) {
+  return left.contains(right.start) || right.contains(left.start);
 }

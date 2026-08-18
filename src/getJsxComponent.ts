@@ -6,6 +6,12 @@ export type SourceCall = {
   uri: vscode.Uri;
   range: vscode.Range;
   callSiteRange: vscode.Range;
+  isObjectMethod: boolean;
+};
+
+export type SourceCallCollection = {
+  calls: SourceCall[];
+  objectMethodRanges: vscode.Range[];
 };
 
 type SourceCallOptions = {
@@ -15,7 +21,7 @@ type SourceCallOptions = {
 export async function getSourceCalls(
   item: vscode.CallHierarchyItem,
   options: SourceCallOptions = {},
-): Promise<SourceCall[]> {
+): Promise<SourceCallCollection> {
   const document = await vscode.workspace.openTextDocument(item.uri);
 
   const sourceFile = ts.createSourceFile(
@@ -32,8 +38,13 @@ export async function getSourceCalls(
   const rootCallable = findRootCallable(sourceFile, selectionStart);
 
   const result: SourceCall[] = [];
+  const objectMethodRanges: vscode.Range[] = [];
 
-  async function addReference(name: string, reference: ts.Node) {
+  async function addReference(
+    name: string,
+    reference: ts.Node,
+    isObjectMethod = false,
+  ) {
     const position = document.positionAt(reference.getStart(sourceFile));
 
     const definitions = await vscode.commands.executeCommand<
@@ -59,7 +70,7 @@ export async function getSourceCalls(
             document.positionAt(reference.getEnd()),
           );
 
-    result.push({ name, uri, range, callSiteRange });
+    result.push({ name, uri, range, callSiteRange, isObjectMethod });
   }
 
   async function visit(node: ts.Node) {
@@ -98,7 +109,22 @@ export async function getSourceCalls(
       const reference = getCallableReference(node.expression);
 
       if (reference) {
-        await addReference(reference.getText(sourceFile), reference);
+        const isObjectMethod = isObjectMethodCall(node.expression);
+
+        if (isObjectMethod) {
+          objectMethodRanges.push(
+            new vscode.Range(
+              document.positionAt(reference.getStart(sourceFile)),
+              document.positionAt(reference.getEnd()),
+            ),
+          );
+        }
+
+        await addReference(
+          reference.getText(sourceFile),
+          reference,
+          isObjectMethod,
+        );
       }
     }
 
@@ -109,7 +135,14 @@ export async function getSourceCalls(
 
   await visit(sourceFile);
 
-  return result;
+  return { calls: result, objectMethodRanges };
+}
+
+function isObjectMethodCall(expression: ts.Expression) {
+  return (
+    ts.isPropertyAccessExpression(expression) ||
+    ts.isElementAccessExpression(expression)
+  );
 }
 
 function getCallableReference(expression: ts.Expression): ts.Node | undefined {

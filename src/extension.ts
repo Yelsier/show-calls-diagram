@@ -49,11 +49,16 @@ async function showDiagram(
     true,
   );
   const hideReactHooks = configuration.get<boolean>("hideReactHooks", true);
+  const hideObjectMethodCalls = configuration.get<boolean>(
+    "hideObjectMethodCalls",
+    true,
+  );
 
   const graph = await buildGraph(root, {
     maxDepth,
     hideDefaultJsFunctions,
     hideReactHooks,
+    hideObjectMethodCalls,
     reactOnly,
   });
 
