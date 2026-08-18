@@ -63,3 +63,7 @@ See the extension's Changelog tab for version history.
 
 - [Source code](https://github.com/Yelsier/show-calls-diagram)
 - [Report an issue](https://github.com/Yelsier/show-calls-diagram/issues)
+
+## License
+
+Licensed under the [MIT License](LICENSE).
