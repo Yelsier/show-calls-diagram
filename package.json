@@ -1,6 +1,7 @@
 {
   "name": "show-calls-diagram",
   "displayName": "Show Calls Diagram",
+  "publisher": "yelsier",
   "description": "Visualize TypeScript call hierarchies and React component trees with direct source navigation.",
   "version": "0.1.0",
   "license": "MIT",
