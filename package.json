@@ -3,6 +3,14 @@
   "displayName": "Show Calls Diagram",
   "description": "Visualize TypeScript call hierarchies and React component trees with direct source navigation.",
   "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yelsier/show-calls-diagram.git"
+  },
+  "homepage": "https://github.com/Yelsier/show-calls-diagram#readme",
+  "bugs": {
+    "url": "https://github.com/Yelsier/show-calls-diagram/issues"
+  },
   "icon": "images/icon.png",
   "galleryBanner": {
     "color": "#071044",

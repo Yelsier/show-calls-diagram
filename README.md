@@ -58,3 +58,8 @@ Analysis runs locally through VS Code's extension and language APIs. The extensi
 ## Release notes
 
 See the extension's Changelog tab for version history.
+
+## Source and support
+
+- [Source code](https://github.com/Yelsier/show-calls-diagram)
+- [Report an issue](https://github.com/Yelsier/show-calls-diagram/issues)
