@@ -1,0 +1,122 @@
+{
+  "name": "show-calls-diagram",
+  "displayName": "Show Calls Diagram",
+  "description": "Visualize TypeScript call hierarchies and React component trees with direct source navigation.",
+  "version": "0.1.0",
+  "icon": "images/icon.png",
+  "galleryBanner": {
+    "color": "#071044",
+    "theme": "dark"
+  },
+  "pricing": "Free",
+  "keywords": [
+    "call graph",
+    "call hierarchy",
+    "diagram",
+    "typescript",
+    "react",
+    "tsx",
+    "visualization"
+  ],
+  "engines": {
+    "vscode": "^1.125.0"
+  },
+  "categories": [
+    "Visualization",
+    "Other"
+  ],
+  "extensionKind": [
+    "workspace"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Show Calls Diagram",
+      "properties": {
+        "showCallsDiagram.maxDepth": {
+          "type": "integer",
+          "default": 10,
+          "minimum": 0,
+          "description": "Maximum number of call levels expanded below the selected function."
+        },
+        "showCallsDiagram.hideDefaultJsFunctions": {
+          "type": "boolean",
+          "default": true,
+          "description": "Hide calls to standard JavaScript and browser functions declared by the TypeScript standard library."
+        },
+        "showCallsDiagram.hideReactHooks": {
+          "type": "boolean",
+          "default": true,
+          "description": "Hide calls to hooks provided by React and React DOM, such as useState and useEffect."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "showCallsDiagram.show",
+        "title": "Show Calls Diagram",
+        "category": "Show Calls Diagram"
+      },
+      {
+        "command": "showCallsDiagram.showReactComponents",
+        "title": "Show React Components Diagram",
+        "category": "Show Calls Diagram",
+        "enablement": "editorLangId == typescriptreact"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "showCallsDiagram.show",
+          "when": "editorLangId == typescript || editorLangId == typescriptreact",
+          "group": "navigation@50"
+        },
+        {
+          "command": "showCallsDiagram.showReactComponents",
+          "when": "editorLangId == typescriptreact",
+          "group": "navigation@51"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "showCallsDiagram.showReactComponents",
+          "when": "editorLangId == typescriptreact"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "pnpm run package",
+    "compile": "pnpm run check-types && pnpm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "pnpm run check-types && pnpm run lint && node esbuild.js --production",
+    "vsix": "vsce package",
+    "publish:marketplace": "vsce publish",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "24.x",
+    "@types/vscode": "^1.125.0",
+    "@vscode/test-cli": "^0.0.15",
+    "@vscode/test-electron": "^3.0.0",
+    "@vscode/vsce": "^3.9.2",
+    "esbuild": "^0.28.1",
+    "eslint": "^10.5.0",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.1"
+  },
+  "overrides": {
+    "diff": "^8.0.4",
+    "serialize-javascript": "^7.0.6"
+  }
+}
